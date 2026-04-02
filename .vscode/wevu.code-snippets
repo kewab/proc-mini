@@ -1,0 +1,39 @@
+{
+	"wevu-comp": {
+		"scope": "vue",
+		"prefix": "wevu-comp",
+		"body": [
+			"<script setup lang=\"ts\">",
+      "defineComponentJson({",
+      "\tstyleIsolation: 'apply-shared',",
+      "})",
+			"</script>\n",
+			"<template>",
+			"\t<view>",
+      "\t\t$1",
+      "\t</view>",
+			"</template>\n",
+		],
+		"description": "wevu快速生成模板，包含组件配置和默认样式"
+	},
+	"wevu-page": {
+		"scope": "vue",
+		"prefix": "wevu-page",
+		"body": [
+			"<script setup lang=\"ts\">",
+      "definePageJson({",
+      "\tnavigationBarTitleText: '$1',",
+      "\tenablePullDownRefresh: true,",
+      "\tbackgroundColor: '#f6f7fb',",
+      "\tnavigationStyle: 'custom',",
+      "})",
+			"</script>\n",
+			"<template>",
+			"\t<view class=\"min-h-screen\">",
+      "\t\t$2",
+      "\t</view>",
+			"</template>\n",
+		],
+		"description": "wevu快速生成模板，包含页面配置和默认样式"
+	},
+}
