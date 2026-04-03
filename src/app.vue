@@ -4,16 +4,19 @@ import { onHide, onLaunch, onShow } from 'wevu'
 defineAppJson({
   pages: [
     'pages/index/index',
-    'pages/data/index',
-    'pages/form/index',
+    'pages/category/index',
+    'pages/cart/index',
+    'pages/user/index',
+    'pages/test/index',
   ],
   window: {
-    navigationBarTitleText: 'Weapp Studio',
+    navigationBarTitleText: '采购小程序',
     navigationBarBackgroundColor: '#2f2b5f',
     navigationBarTextStyle: 'white',
     backgroundTextStyle: 'dark',
   },
   tabBar: {
+    custom: true, // 关键：开启自定义
     color: '#7a7aa0',
     selectedColor: '#2f2b5f',
     backgroundColor: '#ffffff',
@@ -22,20 +25,18 @@ defineAppJson({
       {
         pagePath: 'pages/index/index',
         text: '首页',
-        iconPath: 'tabbar/home.png',
-        selectedIconPath: 'tabbar/home-active.png',
       },
       {
-        pagePath: 'pages/data/index',
-        text: '数据',
-        iconPath: 'tabbar/data.png',
-        selectedIconPath: 'tabbar/data-active.png',
+        pagePath: 'pages/category/index',
+        text: '分类',
       },
       {
-        pagePath: 'pages/form/index',
-        text: '表单',
-        iconPath: 'tabbar/form.png',
-        selectedIconPath: 'tabbar/form-active.png',
+        pagePath: 'pages/cart/index',
+        text: '购物车',
+      },
+      {
+        pagePath: 'pages/user/index',
+        text: '我的',
       },
     ],
   },

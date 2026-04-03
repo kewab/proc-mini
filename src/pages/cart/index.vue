@@ -1,6 +1,6 @@
 <script setup lang="ts">
 definePageJson({
-  navigationBarTitleText: '数据',
+  navigationBarTitleText: '购物车',
   enablePullDownRefresh: true,
   backgroundColor: '#f6f7fb',
   navigationStyle: 'custom',
@@ -9,6 +9,6 @@ definePageJson({
 
 <template>
   <view class="min-h-screen">
-    数据
+    购物车
   </view>
 </template>

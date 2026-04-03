@@ -1,5 +1,3 @@
-import { useToast } from '@/hooks/useToast'
-
 export interface ApiResponse<T> {
   code: number
   msg: string
@@ -66,16 +64,17 @@ function parseResponseData<T>(payload: unknown) {
 }
 
 function rejectWithToast(
-  showToast: (message: string, theme?: 'error') => void,
   reject: (reason?: any) => void,
   message: string,
 ) {
-  showToast(message, 'error')
+  wx.showToast({
+    title: message,
+    icon: 'error',
+  })
   reject(message)
 }
 
 export async function request<T>(options: WechatMiniprogram.RequestOption) {
-  const { showToast } = useToast()
   const headers = {
     ...buildBaseHeaders(),
     ...(options.header as HeaderMap | undefined),
@@ -88,7 +87,7 @@ export async function request<T>(options: WechatMiniprogram.RequestOption) {
       header: headers,
       success(res) {
         if (res.statusCode < 200 || res.statusCode >= 300) {
-          rejectWithToast(showToast, reject, '服务器返回异常')
+          rejectWithToast(reject, '服务器返回异常')
           return
         }
         const data = parseResponseData<T>(res.data)
@@ -96,10 +95,10 @@ export async function request<T>(options: WechatMiniprogram.RequestOption) {
           resolve(data.data as T)
           return
         }
-        rejectWithToast(showToast, reject, data.msg || '请求失败')
+        rejectWithToast(reject, data.msg || '请求失败')
       },
       fail() {
-        rejectWithToast(showToast, reject, '请求失败')
+        rejectWithToast(reject, '请求失败')
       },
     })
   })

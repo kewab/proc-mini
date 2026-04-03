@@ -10,10 +10,18 @@
 
 - `pnpm dev --open` 可以打包并直接启动微信开发者工具
 
+### 校验（必选）
+
+- `pnpm lint` 校验代码
+
+- `pnpm typecheck` 校验类型
+
+- `pnpm stylelint` 校验样式
+
 ### 推荐写法
 
 - 页面/组件优先使用 Vue `<script setup>`（编译宏）写法
-- 配置使用 `<json>` 自定义块
+- 配置使用 defineComponentJson 定义组件配置、definePageJson 定义页面配置
 
 ### 构建
 

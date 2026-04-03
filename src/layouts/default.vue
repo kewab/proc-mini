@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import BaseFooter from '@/components/base-footer/index.vue'
+import BaseNavbar from '@/components/base-navbar/index.vue'
 
 defineComponentJson({
   component: true,
@@ -12,6 +13,7 @@ defineComponentJson({
 
 <template>
   <view class="layout-default">
+    <BaseNavbar />
     <slot />
     <BaseFooter />
     <t-toast layout-host="layout-toast" />
@@ -22,5 +24,7 @@ defineComponentJson({
 <style>
 .layout-default {
   min-height: 100%;
+  padding-bottom: calc(98rpx + env(safe-area-inset-bottom));
+  padding-bottom: calc(98rpx + constant(safe-area-inset-bottom));
 }
 </style>

@@ -32,8 +32,12 @@ function refreshDashboard() {
 function login() {
   Login().then(() => {
     showToast('登录成功')
-  }).catch((err) => {
-    showToast(err, 'error')
+  })
+}
+
+function toTest() {
+  wx.navigateTo({
+    url: '/pages/test/index',
   })
 }
 
@@ -45,6 +49,9 @@ usePullDownRefresh(refreshDashboard)
     测试采购小程序
     <button @tap="login">
       点击
+    </button>
+    <button @tap="toTest">
+      测试
     </button>
   </view>
 </template>
