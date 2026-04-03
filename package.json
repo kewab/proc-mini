@@ -11,6 +11,7 @@
     "dev": "wv dev",
     "dev:open": "wv dev -o",
     "build": "wv build",
+    "check": "pnpm lint && pnpm typecheck && pnpm stylelint",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "typecheck": "vue-tsc --noEmit -p .weapp-vite/tsconfig.app.json",
@@ -24,7 +25,7 @@
   },
   "devDependencies": {
     "@egoist/tailwindcss-icons": "^1.9.2",
-    "@icebreakers/eslint-config": "^2.1.2",
+    "@icebreakers/eslint-config": "^3.0.1",
     "@icebreakers/stylelint-config": "^2.2.1",
     "@iconify-json/mdi": "^1.2.3",
     "autoprefixer": "^10.4.27",
@@ -37,7 +38,7 @@
     "typescript": "^6.0.2",
     "vue-tsc": "^3.2.6",
     "weapp-tailwindcss": "^4.11.2",
-    "weapp-vite": "^6.12.4",
-    "wevu": "^6.12.4"
+    "weapp-vite": "^6.13.0",
+    "wevu": "^6.13.0"
   }
 }

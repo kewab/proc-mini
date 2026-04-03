@@ -12,11 +12,8 @@
 
 ### 校验（必选）
 
-- `pnpm lint` 校验代码
-
-- `pnpm typecheck` 校验类型
-
-- `pnpm stylelint` 校验样式
+- 任务完成前统一执行：`pnpm check`
+- `pnpm check` 会依次执行 `pnpm lint`、`pnpm typecheck`、`pnpm stylelint`
 
 ### 推荐写法
 

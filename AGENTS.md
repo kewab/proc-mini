@@ -21,6 +21,7 @@
 - Keep `vite.config.ts` as the source of truth for `weapp` config, output behavior, and IDE/MCP automation.
 - Confirm `weapp.srcRoot`, routes, subpackages, and auto-import strategy before broad refactors.
 - Prefer minimal scoped verification: targeted `pnpm build`, targeted tests, then broader checks only when required.
+- Task completion gate: before handing off any coding task, run `pnpm check` (equivalent to `pnpm lint`, `pnpm typecheck`, `pnpm stylelint`) and report results.
 - If editing package source in a monorepo dependency, rebuild the touched package before validating downstream apps to avoid stale `dist`.
 - Keep CLI ownership explicit: native `weapp-vite` commands first, IDE passthrough second.
 
