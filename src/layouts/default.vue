@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed, onMounted, ref } from 'wevu'
 import BaseFooter from '@/components/base-footer/index.vue'
 import BaseNavbar from '@/components/base-navbar/index.vue'
 
@@ -9,11 +10,26 @@ defineComponentJson({
     't-toast': 'tdesign-miniprogram/toast/toast',
   },
 })
+
+const currentRoute = ref('')
+const showNavbar = computed(() => currentRoute.value !== 'pages/index/index')
+
+function syncRoute() {
+  const currentPage = getCurrentPages().at(-1)
+  currentRoute.value = currentPage?.route || ''
+}
+
+onMounted(() => {
+  syncRoute()
+  wx.onAppRoute?.(() => {
+    syncRoute()
+  })
+})
 </script>
 
 <template>
   <view class="layout-default">
-    <BaseNavbar />
+    <BaseNavbar v-if="showNavbar" />
     <slot />
     <BaseFooter />
     <t-toast layout-host="layout-toast" />
