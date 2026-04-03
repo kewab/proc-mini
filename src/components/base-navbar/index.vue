@@ -112,7 +112,7 @@ onMounted(() => {
 
     <view
       class="fixed left-0 right-0 top-0 z-[101]"
-      :class="props.isBackgroundColor ? 'bg-[#e93323]' : ''"
+      :class="props.isBackgroundColor ? 'bg-transparent' : ''"
       :style="{ height: `${navHeightPx}px` }"
     >
       <view class="relative h-full w-full">

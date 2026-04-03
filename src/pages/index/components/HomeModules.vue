@@ -51,7 +51,6 @@ function handleSwiperChange(event: { detail?: { current?: number } }) {
       <view v-for="item in props.navItems" :key="item.id" class="home-modules__nav-item" @tap="emit('tap-nav', item)">
         <view class="home-modules__nav-badge">
           <image :src="item.image" mode="aspectFill" class="home-modules__nav-image" />
-          <view :class="`${item.iconClass} home-modules__nav-icon`" />
         </view>
         <text class="home-modules__nav-title">{{ item.name }}</text>
         <text class="home-modules__nav-desc">{{ item.description }}</text>
@@ -109,31 +108,31 @@ function handleSwiperChange(event: { detail?: { current?: number } }) {
 }
 
 .home-modules__nav-grid {
-  @apply mt-[24rpx] grid grid-cols-4 gap-[8rpx] p-[20rpx];
+  @apply mt-[24rpx] grid grid-cols-4 gap-x-[14rpx] gap-y-[16rpx] p-[24rpx];
 }
 
 .home-modules__nav-item {
-  @apply flex items-center justify-center px-[6rpx] py-[8rpx];
+  @apply flex flex-col items-center rounded-[18rpx] bg-[#f8fafc] px-[8rpx] py-[16rpx];
 }
 
 .home-modules__nav-badge {
-  @apply relative;
+  @apply relative h-[88rpx] w-[88rpx];
 }
 
 .home-modules__nav-image {
-  @apply h-[84rpx] w-[84rpx] rounded-full;
+  @apply h-full w-full rounded-full;
 }
 
 .home-modules__nav-icon {
-  @apply absolute bottom-[-6rpx] right-[-6rpx] rounded-full bg-[#f25d34] p-[8rpx] text-[22rpx] text-white;
+  @apply absolute bottom-[-6rpx] right-[-6rpx] rounded-full border-[3rpx] border-white bg-[#f25d34] p-[7rpx] text-[22rpx] text-white;
 }
 
 .home-modules__nav-title {
-  @apply mt-[14rpx] text-[26rpx] font-semibold text-[#111827];
+  @apply mt-[12rpx] max-w-full truncate text-center text-[24rpx] font-semibold leading-[32rpx] text-[#111827];
 }
 
 .home-modules__nav-desc {
-  @apply mt-[6rpx] text-[20rpx] text-[#9ca3af];
+  @apply mt-[4rpx] max-w-full truncate text-center text-[20rpx] leading-[28rpx] text-[#9ca3af];
 }
 
 .home-modules__activities {

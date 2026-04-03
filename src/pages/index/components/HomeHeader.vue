@@ -111,7 +111,7 @@ onMounted(() => {
 }
 
 .home-header__search-icon {
-  @apply mr-[12rpx] text-[30rpx] text-[#6b7280];
+  @apply mr-[12rpx] text-[40rpx] text-[#6b7280];
 }
 
 .home-header__search-text {
