@@ -38,7 +38,7 @@
     "typescript": "^6.0.2",
     "vue-tsc": "^3.2.6",
     "weapp-tailwindcss": "^4.11.2",
-    "weapp-vite": "^6.13.1",
-    "wevu": "^6.13.1"
+    "weapp-vite": "^6.13.3",
+    "wevu": "^6.13.3"
   }
 }

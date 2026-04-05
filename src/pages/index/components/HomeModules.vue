@@ -67,10 +67,10 @@ function handleSwiperChange(event: { detail?: { current?: number } }) {
         <view class="home-modules__activity-copy">
           <text class="home-modules__activity-title">{{ item.title }}</text>
           <text class="home-modules__activity-subtitle">{{ item.subtitle }}</text>
-          <text class="home-modules__activity-cta">
+          <view class="home-modules__activity-cta">
             {{ item.cta }}
             <text class="i-mdi-chevron-right home-modules__activity-arrow" />
-          </text>
+          </view>
         </view>
         <image :src="item.image" mode="aspectFill" class="home-modules__activity-image" />
       </view>

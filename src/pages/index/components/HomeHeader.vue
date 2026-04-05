@@ -107,7 +107,7 @@ onMounted(() => {
 }
 
 .home-header__search {
-  @apply mt-[16rpx] flex h-[72rpx] items-center rounded-[999rpx] bg-white px-[24rpx] text-[#9ca3af];
+  @apply mt-[16rpx] flex h-[72rpx] items-center rounded-[999rpx] bg-[#F5F5F5] px-[24rpx] text-[#9ca3af];
 }
 
 .home-header__search-icon {
@@ -123,11 +123,7 @@ onMounted(() => {
 }
 
 .home-header--solid {
-  @apply shadow-[0_8rpx_24rpx_rgba(15,23,42,0.08)];
-}
-
-.home-header--solid .home-header__top-shell {
-  @apply bg-white;
+  @apply shadow-[0_8rpx_24rpx_rgba(15,23,42,0.08)] bg-white;
 }
 
 .home-header--solid .home-header__brand {
