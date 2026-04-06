@@ -12,7 +12,9 @@ defineComponentJson({
 })
 
 const currentRoute = ref('')
-const showNavbar = computed(() => !['pages/index/index', 'pages/category/index'].includes(currentRoute.value))
+
+const customNavbar = ['pages/index/index', 'pages/category/index', 'pages/cart/index']
+const showNavbar = computed(() => !customNavbar.includes(currentRoute.value))
 
 function syncRoute() {
   const currentPage = getCurrentPages().at(-1)
