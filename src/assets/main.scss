@@ -1,0 +1,45 @@
+page {
+  font-family: 'HarmonyOS Sans', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  background-color: #f6f7fb;
+
+  /* TDesign 主题定制 */
+  --td-brand-color-1: #ecf8ff;
+  --td-brand-color-2: #d5eeff;
+  --td-brand-color-3: #b3e3ff;
+  --td-brand-color-4: #8ad4ff;
+  --td-brand-color-5: #5cc3ff;
+  --td-brand-color-6: #31b1ff;
+  --td-brand-color-7: #2ea8ff;
+  --td-brand-color-8: #1788d6;
+  --td-brand-color-9: #0f6aa8;
+  --td-brand-color-10: #0a4a75;
+  --td-primary-color-1: var(--td-brand-color-1);
+  --td-primary-color-2: var(--td-brand-color-2);
+  --td-primary-color-3: var(--td-brand-color-3);
+  --td-primary-color-4: var(--td-brand-color-4);
+  --td-primary-color-5: var(--td-brand-color-5);
+  --td-primary-color-6: var(--td-brand-color-6);
+  --td-primary-color-7: var(--td-brand-color-7);
+  --td-primary-color-8: var(--td-brand-color-8);
+  --td-primary-color-9: var(--td-brand-color-9);
+  --td-primary-color-10: var(--td-brand-color-10);
+  --td-brand-color: var(--td-primary-color-7);
+  --td-brand-color-focus: var(--td-primary-color-1);
+  --td-brand-color-active: var(--td-primary-color-8);
+  --td-brand-color-disabled: var(--td-primary-color-3);
+  --td-brand-color-light: var(--td-primary-color-1);
+  --td-brand-color-light-active: var(--td-primary-color-2);
+  --td-text-color-brand: var(--td-brand-color);
+  --td-text-color-link: var(--td-brand-color);
+  --td-error-color-1: #fff3ef;
+  --td-error-color-2: #ffe1d7;
+  --td-error-color-3: #ffc3ae;
+  --td-error-color-4: #ff9f82;
+  --td-error-color-5: #ff7a5b;
+  --td-error-color-6: #ff5a36;
+  --td-error-color-7: #e64524;
+  --td-error-color-8: #bf3518;
+  --td-error-color-9: #992710;
+  --td-error-color-10: #731a09;
+  --td-error-color: var(--td-error-color-6);
+}

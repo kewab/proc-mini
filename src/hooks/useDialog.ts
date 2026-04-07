@@ -1,6 +1,13 @@
+import type { ButtonProps, TdButtonProps } from 'tdesign-miniprogram/button'
 import Dialog from 'tdesign-miniprogram/dialog/index'
 import { getCurrentInstance, resolveLayoutBridge, resolveLayoutHost } from 'wevu'
 import { LAYOUT_DIALOG_BRIDGE_KEY } from '@/hooks/useLayoutFeedbackBridge'
+
+type ResolveTDesignPropValue<T> = T extends { value?: infer V } ? V : never
+type ButtonValueProps = {
+  [K in keyof TdButtonProps]?: ResolveTDesignPropValue<TdButtonProps[K]>
+}
+type DialogButton = string | ButtonValueProps | ButtonProps | null
 
 export interface DialogOptions {
   bridgeKey?: string
@@ -10,7 +17,7 @@ export interface DialogOptions {
 
 interface BaseDialogPayload {
   bridgeKey?: string
-  confirmBtn?: string
+  confirmBtn?: DialogButton
   content: string
   context?: any
   selector?: string
@@ -20,7 +27,7 @@ interface BaseDialogPayload {
 export interface AlertOptions extends BaseDialogPayload {}
 
 export interface ConfirmOptions extends BaseDialogPayload {
-  cancelBtn?: string
+  cancelBtn?: DialogButton
 }
 
 interface HostDialogInstance {
@@ -166,11 +173,22 @@ function openDialog<T extends BaseDialogPayload>(mode: DialogMode, payload: T) {
 
   const open = mode === 'alert' ? Dialog.alert : Dialog.confirm
 
-  return open({
+  const dialogPayload = {
     selector,
     context: context as any,
     ...normalizedPayload,
-  })
+  } as Record<string, unknown>
+
+  // `tdesign-miniprogram/dialog` type declaration does not accept `null` here,
+  // but host mode uses `null` to hide a button. Strip null before static API call.
+  if (dialogPayload.confirmBtn == null) {
+    delete dialogPayload.confirmBtn
+  }
+  if (dialogPayload.cancelBtn == null) {
+    delete dialogPayload.cancelBtn
+  }
+
+  return open(dialogPayload as any)
 }
 
 export function alertDialog(payload: AlertOptions) {

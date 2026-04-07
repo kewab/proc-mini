@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'wevu'
 import goodsImage from '@/assets/images/home/goods-1.png'
+import { useDialog } from '@/hooks/useDialog'
 
 definePageJson({
   navigationBarTitleText: '购物车',
@@ -97,6 +98,7 @@ const selectedCount = computed(() => selectedItems.value.length)
 const selectedAmount = computed(() => Number(selectedItems.value.reduce((sum, item) => sum + item.price * item.quantity, 0).toFixed(1)))
 
 const allSelected = computed(() => cartItems.value.length > 0 && selectedItems.value.length === cartItems.value.length)
+const { confirm } = useDialog()
 
 function resolveNavMetrics() {
   const systemInfo = wx.getWindowInfo?.() || wx.getSystemInfoSync()
@@ -121,12 +123,21 @@ function toggleSelectAll() {
 }
 
 function deleteSelected() {
-  const nextItems = cartItems.value.filter(item => !item.selected)
-  if (nextItems.length === cartItems.value.length) {
-    wx.showToast({ title: '请先选择商品', icon: 'none' })
-    return
-  }
-  cartItems.value = nextItems
+  confirm({
+    title: '删除商品',
+    content: `确认将这${selectedCount.value}个宝贝删除？`,
+    confirmBtn: { content: '确定', variant: 'base' },
+    cancelBtn: { content: '取消' },
+  }).then(() => {
+    const nextItems = cartItems.value.filter(item => !item.selected)
+    if (nextItems.length === 0) {
+      wx.showToast({ title: '请先选择商品', icon: 'none' })
+      return
+    }
+    cartItems.value = nextItems
+  }).catch(() => {
+    // user cancelled
+  })
 }
 
 function changeQuantity(id: string, delta: number) {
@@ -246,7 +257,7 @@ onMounted(() => {
         <text class="cart-page__total-price">¥{{ formatPrice(selectedAmount) }}</text>
       </view>
 
-      <view class="cart-page__checkout-btn">
+      <view class="cart-page__checkout-btn text-red2">
         去下单({{ selectedCount }})
       </view>
     </view>

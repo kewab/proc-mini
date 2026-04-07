@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onHide, onLaunch, onShow } from 'wevu'
+import './assets/main.scss'
 
 defineAppJson({
   pages: [
@@ -62,9 +63,4 @@ onLaunch(() => {
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-page {
-  font-family: 'HarmonyOS Sans', 'PingFang SC', 'Microsoft YaHei', sans-serif;
-  background-color: #f6f7fb;
-}
 </style>
