@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'wevu'
-import BaseFooter from '@/components/base-footer/index.vue'
-import BaseNavbar from '@/components/base-navbar/index.vue'
+import Navbar from '@/components/application/navbar.vue'
+import Tabbar from '@/components/application/tabbar.vue'
 
 defineComponentJson({
   component: true,
@@ -31,9 +31,9 @@ onMounted(() => {
 
 <template>
   <view class="layout-default">
-    <BaseNavbar v-if="showNavbar" />
+    <Navbar v-if="showNavbar" />
     <slot />
-    <BaseFooter />
+    <Tabbar />
     <t-toast layout-host="layout-toast" />
     <t-dialog layout-host="layout-dialog" />
   </view>

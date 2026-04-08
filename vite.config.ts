@@ -31,6 +31,7 @@ export default defineConfig({
     wevu: {
       defaults: {
         component: {
+          externalClasses: ['custom-class'],
           options: {
             virtualHost: true,
             styleIsolation: 'apply-shared',
