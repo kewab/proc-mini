@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'wevu'
+import { onMounted, ref, storeToRefs } from 'wevu'
 import goodsImage from '@/assets/images/home/goods-1.png'
 import { useDialog } from '@/hooks/useDialog'
+import { useCartStore } from '@/stores/cart'
 
 definePageJson({
   navigationBarTitleText: '购物车',
@@ -10,17 +11,6 @@ definePageJson({
   navigationStyle: 'custom',
 })
 
-interface CartItem {
-  id: string
-  image: string
-  name: string
-  price: number
-  quantity: number
-  selected: boolean
-  tag: string
-  unit: string
-}
-
 interface RecommendItem {
   id: string
   image: string
@@ -28,49 +18,6 @@ interface RecommendItem {
   subtitle: string
   title: string
 }
-
-const cartItems = ref<CartItem[]>([
-  {
-    id: 'beef-1',
-    image: goodsImage,
-    name: '进口牛肋肉1kg',
-    price: 76.9,
-    quantity: 25,
-    selected: true,
-    tag: '明日达',
-    unit: '袋',
-  },
-  {
-    id: 'beef-2',
-    image: goodsImage,
-    name: '金钱腱 1kg',
-    price: 108,
-    quantity: 1,
-    selected: true,
-    tag: '明日达',
-    unit: '袋',
-  },
-  {
-    id: 'beef-3',
-    image: goodsImage,
-    name: '进口原切谷饲牛腱1.2kg',
-    price: 108,
-    quantity: 1,
-    selected: true,
-    tag: '明日达',
-    unit: '包',
-  },
-  {
-    id: 'shrimp-1',
-    image: goodsImage,
-    name: '原装进口王牌盐冻虾 1.5kg (约60-75只)',
-    price: 75.8,
-    quantity: 1,
-    selected: true,
-    tag: '明日达',
-    unit: '盒',
-  },
-])
 
 const recommendItems: RecommendItem[] = [
   {
@@ -92,12 +39,8 @@ const recommendItems: RecommendItem[] = [
 const statusBarHeightPx = ref(20)
 const menuButtonHeightPx = ref(32)
 const navHeightPx = ref(65)
-
-const selectedItems = computed(() => cartItems.value.filter(item => item.selected))
-const selectedCount = computed(() => selectedItems.value.length)
-const selectedAmount = computed(() => Number(selectedItems.value.reduce((sum, item) => sum + item.price * item.quantity, 0).toFixed(1)))
-
-const allSelected = computed(() => cartItems.value.length > 0 && selectedItems.value.length === cartItems.value.length)
+const cartStore = useCartStore()
+const { allSelected, cartItems, selectedPayableAmount, selectedProductCount } = storeToRefs(cartStore)
 const { confirm } = useDialog()
 
 function resolveNavMetrics() {
@@ -114,50 +57,62 @@ function formatPrice(value: number) {
 }
 
 function toggleItemSelected(id: string) {
-  cartItems.value = cartItems.value.map(item => item.id === id ? { ...item, selected: !item.selected } : item)
+  cartStore.toggleItemSelected(id)
 }
 
 function toggleSelectAll() {
-  const nextSelected = !allSelected.value
-  cartItems.value = cartItems.value.map(item => ({ ...item, selected: nextSelected }))
+  cartStore.setAllSelected(!allSelected.value)
 }
 
 function deleteSelected() {
+  if (selectedProductCount.value <= 0) {
+    wx.showToast({ title: '请先选择商品', icon: 'none' })
+    return
+  }
+
   confirm({
     title: '删除商品',
-    content: `确认将这${selectedCount.value}个宝贝删除？`,
+    content: `确认删除这${selectedProductCount.value}件已选商品？`,
     confirmBtn: { content: '确定', variant: 'base' },
     cancelBtn: { content: '取消' },
   }).then(() => {
-    const nextItems = cartItems.value.filter(item => !item.selected)
-    if (nextItems.length === 0) {
-      wx.showToast({ title: '请先选择商品', icon: 'none' })
-      return
-    }
-    cartItems.value = nextItems
+    cartStore.removeSelected()
   }).catch(() => {
     // user cancelled
   })
 }
 
 function changeQuantity(id: string, delta: number) {
-  cartItems.value = cartItems.value.map((item) => {
-    if (item.id !== id) {
-      return item
-    }
-    const nextQuantity = Math.max(1, item.quantity + delta)
-    return {
-      ...item,
-      quantity: nextQuantity,
-    }
-  })
+  cartStore.changeQuantity(id, delta)
 }
 
 function updateQuantityByInput(id: string, rawValue: string) {
   const digits = rawValue.replace(/\D/g, '')
   const nextQuantity = digits ? Math.max(1, Number.parseInt(digits, 10)) : 1
 
-  cartItems.value = cartItems.value.map(item => item.id === id ? { ...item, quantity: nextQuantity } : item)
+  cartStore.updateQuantity(id, nextQuantity)
+}
+
+function openSelectedDetail() {
+  if (selectedProductCount.value <= 0) {
+    wx.showToast({ title: '暂无已选商品', icon: 'none' })
+    return
+  }
+
+  cartStore.openDetail('selected')
+}
+
+function goCheckout() {
+  if (selectedProductCount.value <= 0) {
+    wx.showToast({ title: '请先选择商品', icon: 'none' })
+    return
+  }
+
+  wx.navigateTo({ url: '/pages/order/confirm/index' })
+}
+
+function goCategory() {
+  wx.switchTab({ url: '/pages/category/index' })
 }
 
 onMounted(() => {
@@ -184,42 +139,54 @@ onMounted(() => {
             <text class="cart-page__delete" @tap="deleteSelected">删除</text>
           </view>
 
-          <view v-for="item in cartItems" :key="item.id" class="cart-page__item">
-            <view
-              class="cart-page__checkbox"
-              :class="item.selected ? 'cart-page__checkbox--checked' : ''"
-              @tap="toggleItemSelected(item.id)"
-            >
-              <view v-if="item.selected" class="i-mdi-check" />
-            </view>
+          <view v-if="cartItems.length > 0">
+            <view v-for="item in cartItems" :key="item.id" class="cart-page__item">
+              <view
+                class="cart-page__checkbox"
+                :class="item.selected ? 'cart-page__checkbox--checked' : ''"
+                @tap="toggleItemSelected(item.id)"
+              >
+                <view v-if="item.selected" class="i-mdi-check" />
+              </view>
 
-            <image class="cart-page__item-image" :src="item.image" mode="aspectFill" />
+              <image class="cart-page__item-image" :src="item.image" mode="aspectFill" />
 
-            <view class="cart-page__item-main">
-              <text class="cart-page__item-title">{{ item.name }}</text>
-              <text class="cart-page__item-tag">{{ item.tag }}</text>
+              <view class="cart-page__item-main">
+                <text class="cart-page__item-title">{{ item.name }}</text>
+                <text v-if="item.subtitle" class="cart-page__item-subtitle">{{ item.subtitle }}</text>
+                <text class="cart-page__item-tag">{{ item.tag }}</text>
 
-              <view class="cart-page__item-bottom">
-                <view class="cart-page__price-wrap">
-                  <text class="cart-page__price">¥{{ formatPrice(item.price) }}</text>
-                  <text class="cart-page__unit">/{{ item.unit }}</text>
-                </view>
-
-                <view class="cart-page__stepper">
-                  <view class="cart-page__step-btn" @tap="changeQuantity(item.id, -1)">
-                    -
+                <view class="cart-page__item-bottom">
+                  <view class="cart-page__price-wrap">
+                    <text class="cart-page__price">¥{{ formatPrice(item.price) }}</text>
+                    <text class="cart-page__unit">/{{ item.unit }}</text>
                   </view>
-                  <input
-                    class="cart-page__step-input"
-                    type="number"
-                    :value="String(item.quantity)"
-                    @input="updateQuantityByInput(item.id, $event.detail.value)"
-                  >
-                  <view class="cart-page__step-btn" @tap="changeQuantity(item.id, 1)">
-                    +
+
+                  <view class="cart-page__stepper">
+                    <view class="cart-page__step-btn" @tap="changeQuantity(item.id, -1)">
+                      -
+                    </view>
+                    <input
+                      class="cart-page__step-input"
+                      type="number"
+                      :value="String(item.quantity)"
+                      @input="updateQuantityByInput(item.id, $event.detail.value)"
+                    >
+                    <view class="cart-page__step-btn" @tap="changeQuantity(item.id, 1)">
+                      +
+                    </view>
                   </view>
                 </view>
               </view>
+            </view>
+          </view>
+
+          <view v-else class="cart-page__empty">
+            <view class="i-mdi-cart-off cart-page__empty-icon" />
+            <text class="cart-page__empty-title">购物车还是空的</text>
+            <text class="cart-page__empty-desc">去分类页挑几件常用商品，结算区会自动同步。</text>
+            <view class="cart-page__empty-btn" @tap="goCategory">
+              去逛逛
             </view>
           </view>
         </view>
@@ -254,11 +221,12 @@ onMounted(() => {
 
       <view class="cart-page__settle-center">
         <text class="cart-page__total-label">合计:</text>
-        <text class="cart-page__total-price">¥{{ formatPrice(selectedAmount) }}</text>
+        <text class="cart-page__total-price">¥{{ formatPrice(selectedPayableAmount) }}</text>
+        <text class="cart-page__total-detail" @tap="openSelectedDetail">明细</text>
       </view>
 
-      <view class="cart-page__checkout-btn text-red2">
-        去下单({{ selectedCount }})
+      <view class="cart-page__checkout-btn text-red2" :class="selectedProductCount > 0 ? '' : 'cart-page__checkout-btn--disabled'" @tap="goCheckout">
+        去下单({{ selectedProductCount }})
       </view>
     </view>
   </view>
@@ -341,6 +309,10 @@ onMounted(() => {
   @apply block truncate text-[30rpx] font-semibold text-[#333];
 }
 
+.cart-page__item-subtitle {
+  @apply mt-[6rpx] block truncate text-[22rpx] text-[#8d95a1];
+}
+
 .cart-page__item-tag {
   @apply mt-[8rpx] inline-block rounded-[6rpx] border border-[#2ea8ff] px-[8rpx] py-[2rpx] text-[20rpx] text-[#2ea8ff];
 }
@@ -375,6 +347,26 @@ onMounted(() => {
 
 .cart-page__recommend-title-wrap {
   @apply mt-[18rpx] flex items-center justify-center gap-[12rpx];
+}
+
+.cart-page__empty {
+  @apply flex flex-col items-center justify-center px-[20rpx] py-[60rpx] text-center;
+}
+
+.cart-page__empty-icon {
+  @apply text-[84rpx] text-[#cbd5e1];
+}
+
+.cart-page__empty-title {
+  @apply mt-[14rpx] text-[30rpx] font-semibold text-[#334155];
+}
+
+.cart-page__empty-desc {
+  @apply mt-[8rpx] text-[24rpx] leading-[36rpx] text-[#94a3b8];
+}
+
+.cart-page__empty-btn {
+  @apply mt-[20rpx] rounded-[999rpx] bg-[#2ea8ff] px-[28rpx] py-[14rpx] text-[26rpx] font-medium text-white;
 }
 
 .cart-page__recommend-line {
@@ -436,7 +428,15 @@ onMounted(() => {
   @apply ml-[4rpx] text-[44rpx] font-semibold leading-none text-[#ff5a36];
 }
 
+.cart-page__total-detail {
+  @apply ml-[10rpx] text-[24rpx] text-[#ff5a36];
+}
+
 .cart-page__checkout-btn {
   @apply min-w-[220rpx] rounded-[999rpx] bg-[#2ea8ff] px-[24rpx] py-[14rpx] text-center text-[34rpx] font-medium text-white;
+}
+
+.cart-page__checkout-btn--disabled {
+  @apply bg-[#bfdbfe];
 }
 </style>

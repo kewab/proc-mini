@@ -175,25 +175,6 @@ onMounted(() => {
         <view class="user-page__bottom-space" />
       </view>
     </scroll-view>
-
-    <view class="user-page__settle-bar">
-      <view class="user-page__settle-left">
-        <view class="user-page__cart-icon-wrap">
-          <view class="i-mdi-basket user-page__cart-icon" />
-          <text class="user-page__cart-badge">4</text>
-        </view>
-
-        <view class="user-page__settle-price-wrap">
-          <text class="user-page__settle-shop">云享仓</text>
-          <text class="user-page__settle-price">¥2214.3</text>
-          <text class="user-page__settle-detail">明细 ^</text>
-        </view>
-      </view>
-
-      <view class="user-page__checkout-btn">
-        去下单
-      </view>
-    </view>
   </view>
 </template>
 
@@ -412,48 +393,5 @@ onMounted(() => {
 
 .user-page__bottom-space {
   @apply h-[220rpx];
-}
-
-.user-page__settle-bar {
-  @apply fixed left-0 right-0 z-[90] flex items-center justify-between bg-white px-[18rpx] py-[12rpx] shadow-[0_-8rpx_24rpx_rgba(0,0,0,0.08)];
-
-  bottom: calc(98rpx + env(safe-area-inset-bottom));
-  bottom: calc(98rpx + constant(safe-area-inset-bottom));
-}
-
-.user-page__settle-left {
-  @apply flex items-center;
-}
-
-.user-page__cart-icon-wrap {
-  @apply relative mr-[12rpx] flex h-[64rpx] w-[64rpx] items-center justify-center rounded-full bg-[#47b3f8];
-}
-
-.user-page__cart-icon {
-  @apply text-[36rpx] text-white;
-}
-
-.user-page__cart-badge {
-  @apply absolute -right-[10rpx] -top-[10rpx] rounded-[999rpx] bg-[#ff5a36] px-[8rpx] py-[2rpx] text-[20rpx] text-white;
-}
-
-.user-page__settle-price-wrap {
-  @apply flex items-baseline;
-}
-
-.user-page__settle-shop {
-  @apply mr-[8rpx] text-[26rpx] text-[#3d8fca];
-}
-
-.user-page__settle-price {
-  @apply text-[50rpx] font-semibold leading-none text-[#ff4f2f];
-}
-
-.user-page__settle-detail {
-  @apply ml-[6rpx] text-[24rpx] text-[#ff4f2f];
-}
-
-.user-page__checkout-btn {
-  @apply min-w-[188rpx] rounded-[999rpx] bg-[#2ea8ff] px-[24rpx] py-[14rpx] text-center text-[38rpx] font-medium text-white;
 }
 </style>

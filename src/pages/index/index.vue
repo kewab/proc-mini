@@ -186,7 +186,7 @@ usePullDownRefresh(refreshHomePage)
 
 <style scoped lang="scss">
 .home-page {
-  @apply relative min-h-screen overflow-hidden bg-[#f6f7fb] pb-[130rpx];
+  @apply relative min-h-screen overflow-hidden bg-[#f6f7fb] pb-[240rpx];
 }
 
 .home-page__hero {

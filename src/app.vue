@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { onHide, onLaunch, onShow } from 'wevu'
+import { createStore, onHide, onLaunch, onShow } from 'wevu'
 import './assets/main.scss'
+
+createStore()
 
 defineAppJson({
   pages: [
@@ -8,6 +10,7 @@ defineAppJson({
     'pages/category/index',
     'pages/cart/index',
     'pages/user/index',
+    'pages/order/confirm/index',
     'pages/test/index',
   ],
   window: {

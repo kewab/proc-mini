@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from 'wevu'
+import { computed, onMounted, onUnmounted, ref, storeToRefs } from 'wevu'
 import goodsImage from '@/assets/images/home/goods-1.png'
+import { useCartStore } from '@/stores/cart'
 
 interface ProductItem {
   badges: string[]
@@ -267,9 +268,8 @@ const showTagPopup = ref(false)
 
 type SortMode = 'default' | 'price-asc' | 'price-desc' | 'sales'
 const sortMode = ref<SortMode>('sales')
-
-const cartCountMap = ref<Record<string, number>>({})
-const showCartDetail = ref(false)
+const cartStore = useCartStore()
+const { cartItems } = storeToRefs(cartStore)
 
 const topVisibleCategories = computed(() => categoryList.slice(0, 5))
 const currentHotWord = computed(() => hotWords[hotWordIndex.value] || hotWords[0])
@@ -306,15 +306,6 @@ const rankingMap = computed(() => {
   })
   return map
 })
-
-const allProducts = computed(() => categoryList.flatMap(category => category.subCategories.flatMap(sub => sub.products)))
-const cartProductCount = computed(() => Object.values(cartCountMap.value).reduce((sum, count) => sum + count, 0))
-const cartSubtotal = computed(() => {
-  const priceById = new Map(allProducts.value.map(item => [item.id, item.price]))
-  return Number(Object.entries(cartCountMap.value).reduce((sum, [id, count]) => sum + (priceById.get(id) || 0) * count, 0).toFixed(1))
-})
-const shippingFee = computed(() => (cartSubtotal.value >= 199 ? 0 : 8))
-const cartTotal = computed(() => Number((cartSubtotal.value + shippingFee.value).toFixed(1)))
 
 function resolveMetrics() {
   const systemInfo = wx.getWindowInfo?.() || wx.getSystemInfoSync()
@@ -364,15 +355,26 @@ function togglePriceSort() {
   sortMode.value = 'price-asc'
 }
 
-function addToCart(productId: string) {
-  cartCountMap.value = {
-    ...cartCountMap.value,
-    [productId]: (cartCountMap.value[productId] || 0) + 1,
+function addToCart(product: ProductItem, event: WechatMiniprogram.TouchEvent) {
+  cartStore.addItem({
+    id: product.id,
+    image: goodsImage,
+    name: product.name,
+    price: product.price,
+    subtitle: product.origin || product.featureText,
+    tag: product.badges[0] || '次日达',
+    unit: '袋',
+  })
+
+  const { x, y } = event.detail || {}
+  if (typeof x === 'number' && typeof y === 'number') {
+    cartStore.requestFlyToCart(x, y)
   }
 }
 
 function getProductCount(productId: string) {
-  return cartCountMap.value[productId] || 0
+  const found = cartItems.value.find(item => item.id === productId)
+  return found?.quantity || 0
 }
 
 onMounted(() => {
@@ -529,7 +531,7 @@ definePageJson({
                     <text class="category-page__goods-unit">/袋</text>
                   </view>
 
-                  <view class="category-page__cart-btn" @tap="addToCart(item.id)">
+                  <view class="category-page__cart-btn" @tap.stop="addToCart(item, $event)">
                     <view class="i-mdi-cart-outline category-page__cart-btn-icon" />
                     <text v-if="getProductCount(item.id) > 0" class="category-page__cart-btn-count">x{{ getProductCount(item.id) }}</text>
                   </view>
@@ -544,49 +546,14 @@ definePageJson({
         </scroll-view>
       </view>
     </view>
-
-    <view v-if="cartProductCount > 0" class="category-page__cart-summary">
-      <view class="category-page__cart-summary-left">
-        <view class="category-page__cart-summary-icon-wrap">
-          <view class="i-mdi-basket category-page__cart-summary-icon" />
-          <text class="category-page__cart-summary-count">{{ cartProductCount }}</text>
-        </view>
-
-        <view class="category-page__cart-summary-price-wrap">
-          <text class="category-page__cart-summary-price">¥{{ cartTotal }}</text>
-          <text class="category-page__cart-summary-detail" @tap="showCartDetail = !showCartDetail">明细 {{ showCartDetail ? '^' : '∨' }}</text>
-        </view>
-      </view>
-
-      <view class="category-page__checkout-btn">
-        去下单
-      </view>
-    </view>
-
-    <view v-if="showCartDetail && cartProductCount > 0" class="category-page__cart-detail-mask" @tap="showCartDetail = false">
-      <view class="category-page__cart-detail-panel" @tap.stop>
-        <view class="category-page__cart-detail-row">
-          <text>商品小计</text>
-          <text>¥{{ cartSubtotal }}</text>
-        </view>
-        <view class="category-page__cart-detail-row">
-          <text>预计邮费</text>
-          <text>¥{{ shippingFee }}</text>
-        </view>
-        <view class="category-page__cart-detail-row category-page__cart-detail-row--total">
-          <text>合计</text>
-          <text>¥{{ cartTotal }}</text>
-        </view>
-      </view>
-    </view>
   </view>
 </template>
 
 <style scoped lang="scss">
 .category-page {
-  @apply flex h-[calc(100vh-98rpx-env(safe-area-inset-bottom))] flex-col overflow-hidden bg-[#f5f5f5];
+  @apply flex h-[calc(100vh-220rpx-env(safe-area-inset-bottom))] flex-col overflow-hidden bg-[#f5f5f5];
 
-  height: calc(100vh - 98rpx - constant(safe-area-inset-bottom));
+  height: calc(100vh - 220rpx - constant(safe-area-inset-bottom));
 }
 
 .category-page__header {
@@ -893,63 +860,5 @@ definePageJson({
 
 .category-page__rank-badge {
   @apply mt-[10rpx] inline-flex rounded-sm bg-[#FAF5ED] px-[14rpx] py-[4rpx] text-[22rpx] text-[#CC9B46];
-}
-
-.category-page__cart-summary {
-  @apply fixed left-[20rpx] right-[20rpx] z-[80] flex items-center justify-between rounded-[999rpx] bg-white px-[20rpx] py-[14rpx] shadow-[0_-8rpx_30rpx_rgba(31,45,61,0.12)];
-
-  bottom: calc(120rpx + env(safe-area-inset-bottom));
-  bottom: calc(120rpx + constant(safe-area-inset-bottom));
-}
-
-.category-page__cart-summary-left {
-  @apply flex items-center;
-}
-
-.category-page__cart-summary-icon-wrap {
-  @apply relative mr-[12rpx] flex h-[72rpx] w-[72rpx] items-center justify-center rounded-full bg-[#e0f5ff];
-}
-
-.category-page__cart-summary-icon {
-  @apply text-[40rpx] text-[#13a0ef];
-}
-
-.category-page__cart-summary-count {
-  @apply absolute -right-[10rpx] -top-[8rpx] rounded-[999rpx] bg-[#ff5a36] px-[8rpx] py-[2rpx] text-[22rpx] text-white;
-}
-
-.category-page__cart-summary-price-wrap {
-  @apply flex items-baseline;
-}
-
-.category-page__cart-summary-price {
-  @apply text-[58rpx] font-semibold text-[#ff4f2f];
-}
-
-.category-page__cart-summary-detail {
-  @apply ml-[8rpx] text-[32rpx] text-[#ff4f2f];
-}
-
-.category-page__checkout-btn {
-  @apply min-w-[238rpx] rounded-[999rpx] bg-[#15a2f2] px-[26rpx] py-[14rpx] text-center text-[46rpx] font-medium text-white;
-}
-
-.category-page__cart-detail-mask {
-  @apply fixed inset-0 z-[79] bg-[rgba(0,0,0,0.2)];
-}
-
-.category-page__cart-detail-panel {
-  @apply absolute left-[20rpx] right-[20rpx] rounded-[24rpx] bg-white p-[20rpx];
-
-  bottom: calc(240rpx + env(safe-area-inset-bottom));
-  bottom: calc(240rpx + constant(safe-area-inset-bottom));
-}
-
-.category-page__cart-detail-row {
-  @apply flex items-center justify-between py-[8rpx] text-[30rpx] text-[#4b5563];
-}
-
-.category-page__cart-detail-row--total {
-  @apply border-t border-[#f0f0f0] pt-[14rpx] text-[34rpx] font-semibold text-[#111827];
 }
 </style>
