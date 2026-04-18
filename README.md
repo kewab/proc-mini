@@ -32,3 +32,7 @@
 
 0. `weapp-vite`: https://vite.icebreaker.top/
 1. `wevu`: https://vite.icebreaker.top/wevu/
+
+## 设计规范
+
+- 项目统一设计规范：`DESIGN_SPEC.md`

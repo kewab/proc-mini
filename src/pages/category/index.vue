@@ -270,6 +270,13 @@ type SortMode = 'default' | 'price-asc' | 'price-desc' | 'sales'
 const sortMode = ref<SortMode>('sales')
 const cartStore = useCartStore()
 const { cartItems } = storeToRefs(cartStore)
+const productCountMap = computed<Record<string, number>>(() => {
+  const map: Record<string, number> = {}
+  cartItems.value.forEach((item) => {
+    map[item.id] = item.quantity
+  })
+  return map
+})
 
 const topVisibleCategories = computed(() => categoryList.slice(0, 5))
 const currentHotWord = computed(() => hotWords[hotWordIndex.value] || hotWords[0])
@@ -373,8 +380,15 @@ function addToCart(product: ProductItem, event: WechatMiniprogram.TouchEvent) {
 }
 
 function getProductCount(productId: string) {
-  const found = cartItems.value.find(item => item.id === productId)
-  return found?.quantity || 0
+  return productCountMap.value[productId] || 0
+}
+
+function getProductCountLabel(productId: string) {
+  const count = getProductCount(productId)
+  if (count <= 0) {
+    return ''
+  }
+  return count > 99 ? '99+' : `${count}`
 }
 
 onMounted(() => {
@@ -533,7 +547,7 @@ definePageJson({
 
                   <view class="category-page__cart-btn" @tap.stop="addToCart(item, $event)">
                     <view class="i-mdi-cart-outline category-page__cart-btn-icon" />
-                    <text v-if="getProductCount(item.id) > 0" class="category-page__cart-btn-count">x{{ getProductCount(item.id) }}</text>
+                    <text v-if="getProductCount(item.id) > 0" class="category-page__cart-btn-count">{{ getProductCountLabel(item.id) }}</text>
                   </view>
                 </view>
 
@@ -847,7 +861,7 @@ definePageJson({
 }
 
 .category-page__cart-btn {
-  @apply relative flex h-[48rpx] w-[48rpx] items-center justify-center rounded-full bg-[#15a2f2] text-white;
+  @apply relative flex h-[48rpx] w-[48rpx] items-center justify-center overflow-visible rounded-full bg-[#15a2f2] text-white;
 }
 
 .category-page__cart-btn-icon {
@@ -855,7 +869,9 @@ definePageJson({
 }
 
 .category-page__cart-btn-count {
-  @apply absolute -right-[14rpx] -top-[14rpx] rounded-[999rpx] bg-[#ff5a36] px-[8rpx] py-[2rpx] text-[22rpx] font-semibold leading-none;
+  @apply absolute right-0 top-0 min-w-[36rpx] max-w-[88rpx] rounded-[999rpx] bg-[#ff5a36] px-[8rpx] py-[2rpx] text-center text-[20rpx] font-semibold leading-none text-white;
+
+  transform: translate(46%, -46%);
 }
 
 .category-page__rank-badge {
